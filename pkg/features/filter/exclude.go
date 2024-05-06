@@ -1,9 +1,10 @@
 package filter
 
 import (
+	"path/filepath"
+
 	"github.com/timo-reymann/deterministic-zip/pkg/cli"
 	"github.com/timo-reymann/deterministic-zip/pkg/features/conditions"
-	"github.com/timo-reymann/deterministic-zip/pkg/file"
 	"github.com/timo-reymann/deterministic-zip/pkg/output"
 )
 
@@ -25,12 +26,13 @@ func (e Exclude) IsEnabled(c *cli.Configuration) bool {
 func (e Exclude) Execute(c *cli.Configuration) error {
 	var fileExcluded bool
 	files := make([]string, 0)
-	excludes := file.Transform(&c.Exclude)
+	excludes := c.Exclude
 
 	for _, f := range c.SourceFiles {
 		fileExcluded = false
 		for _, pattern := range excludes {
-			isMatch := pattern.Match(f)
+			isMatch, _ := filepath.Match(pattern, f)
+			println(pattern, f, isMatch)
 
 			if isMatch {
 				fileExcluded = true
